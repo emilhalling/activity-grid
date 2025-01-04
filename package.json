@@ -1,0 +1,30 @@
+{
+  "name": "activity-grid",
+  "version": "0.1.0",
+  "description": "A customizable activity grid component similar to GitHub's contribution graph",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "watch": "tsc -w",
+    "prepare": "npm run build",
+    "dev": "vite"
+  },
+  "keywords": [
+    "activity",
+    "grid",
+    "heatmap",
+    "contribution-graph",
+    "web-components",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
