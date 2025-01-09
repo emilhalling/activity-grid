@@ -125,6 +125,8 @@ export class ActivityGrid extends HTMLElement {
       this._startDate = date;
     }
 
+    this._startDate.setHours(0, 0, 0, 1);
+
     if (this.requestUpdate) {
       this.requestUpdate('startDate', null, value);
     }
@@ -142,7 +144,6 @@ export class ActivityGrid extends HTMLElement {
     if (startDayOfWeek !== 0) {
       defaultDate.setDate(defaultDate.getDate() - startDayOfWeek);
     }
-    defaultDate.setHours(0, 0, 0, 1)
     return defaultDate;
   })();
 
@@ -289,22 +290,12 @@ export class ActivityGrid extends HTMLElement {
     const endDate = new Date(this._endDate);
     const endOfDateFull = new Date(this._endDate);
     const startDate = new Date(this._startDate);
-    //const startDate = new Date(endOfDateFull);
 
     let endDayOffset = this.skipWeekends ? 5 - endDate.getDay() : 7 - endDate.getDay();
     if (this.startWeekOnMonday) {
       endDayOffset += 1;
     }
     endOfDateFull.setDate(endOfDateFull.getDate() + endDayOffset);
-
-    //startDate.setFullYear(endOfDateFull.getFullYear() - 1);
-    //startDate.setDate(startDate.getDate() + 7);
-
-    // Adjust start date based on week start
-    // const startDayOfWeek = this.startWeekOnMonday ? (startDate.getDay() || 7) - 1 : startDate.getDay();
-    // if (startDayOfWeek !== 0) {
-    //   startDate.setDate(startDate.getDate() - startDayOfWeek);
-    // }
 
     // Adjust start date based on week start
     const startDayWeekAligned = new Date(startDate);
@@ -316,10 +307,6 @@ export class ActivityGrid extends HTMLElement {
     let gridHTML = '';
     const numWeeks = this.getWeeksBetweenDates(endOfDateFull, startDate);
     this.style.setProperty('--grid-columns', numWeeks.toString());
-
-    // For each day of week (0-6)
-    console.log(startDayWeekAligned);
-    console.log(startDate);
 
     const daysInWeek = this.skipWeekends ? 5 : 7;
     for (let dayOffset = 0; dayOffset < daysInWeek; dayOffset++) {
