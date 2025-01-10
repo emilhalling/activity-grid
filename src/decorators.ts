@@ -28,9 +28,6 @@ export function property<T>(options: { type: any, attribute?: string } = { type:
 				const oldValue = this[key];
 				// Handle boolean attributes
 				if (options.type === Boolean) {
-					console.log(`Value: ${value}`)
-					if (value === 'false') console.log("this is false")
-
 					this[key] = value === '' || value === 'true' || value === true;
 				} else {
 					this[key] = value;

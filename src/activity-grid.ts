@@ -1,15 +1,63 @@
 import { customElement, property, state } from './decorators';
-import { ActivityData, DayCellMap } from './types';
+import { ActivityData, DayCellMap, isValidActivityData } from './types';
 import { themes, isValidTheme, ColorTheme } from './themes';
 import { template } from './template';
 
 @customElement('activity-grid')
 export class ActivityGrid extends HTMLElement {
   @property<ActivityData[]>({ type: Array })
-  data: ActivityData[] = [];
+  set data(value: ActivityData[]) {
+    if (!value || !Array.isArray(value)) {
+      console.warn('Invalid activity data: must be an array. Using empty array instead.');
+      this._data = [];
+      return;
+    }
+  
+    const invalidItems = value.filter(item => !isValidActivityData(item));
+  
+    if (invalidItems.length > 0) {
+      console.warn(
+        'Invalid items found in activity data. They will be filtered out:', 
+        invalidItems
+      );
+    }
+  
+    this._data = value.filter(item => !invalidItems.includes(item));
+  
+    if (this.requestUpdate) {
+      this.requestUpdate('data', this._data, value);
+    }
+  }
+
+  get data(): ActivityData[] {
+    return this._data;
+  }
+
+  private _data: ActivityData[] = [];
 
   @property<string[]>({ type: Array })
   set colors(value: string[]) {
+    // Check if value is empty or invalid
+    if (!value || !Array.isArray(value) || value.length === 0) {
+      console.warn('Invalid or empty colors array provided. Using default theme.');
+      this._colors = themes.default;
+      if (this.requestUpdate) {
+        this.requestUpdate('colors', this._colors, themes.default);
+      }
+      return;
+    }
+
+    // Check if all colors are valid
+    const invalidColors = value.filter(color => !CSS.supports('color', color));
+    if (invalidColors.length > 0) {
+      console.warn(`Invalid colors found: ${invalidColors.join(', ')}. Using default theme.`);
+      this._colors = themes.default;
+      if (this.requestUpdate) {
+        this.requestUpdate('colors', this._colors, themes.default);
+      }
+      return;
+    }
+
     // Only update colors if no theme is set or if colors are explicitly set
     if (!this._colorTheme) {
       this._colors = value;
@@ -74,16 +122,15 @@ export class ActivityGrid extends HTMLElement {
     const date = value ? new Date(value) : new Date();
     if (isNaN(date.getTime())) {
       console.warn('Invalid start-date provided. Using one year before end date instead.');
-      const defaultDate = new Date(this._endDate);
-      defaultDate.setFullYear(defaultDate.getFullYear() - 1);
-
-      // Adjust default day to start from start of week
-      const startDayOfWeek = this.startWeekOnMonday ? (defaultDate.getDay() || 7) - 1 : defaultDate.getDay();
-      if (startDayOfWeek !== 0) {
-        defaultDate.setDate(defaultDate.getDate() - startDayOfWeek);
-      }
+      const defaultDate = this.createDefaultStartDate();
       this._startDate = defaultDate;
-    } else {
+    } 
+    else if (date > this._endDate) {
+      console.warn('Start date cannot be after end date. Using one year before end date instead.');
+      const defaultDate = this.createDefaultStartDate();
+      this._startDate = defaultDate;
+    }
+    else {
       this._startDate = date;
     }
 
@@ -106,8 +153,22 @@ export class ActivityGrid extends HTMLElement {
     if (startDayOfWeek !== 0) {
       defaultDate.setDate(defaultDate.getDate() - startDayOfWeek);
     }
+    // defaultDate.setHours(0, 0, 0, 1);
+    console.log(defaultDate)
     return defaultDate;
   })();
+
+  private createDefaultStartDate(): Date {
+    const defaultDate = new Date(this._endDate);
+    defaultDate.setFullYear(defaultDate.getFullYear() - 1);
+
+    // Adjust to start of week
+    const startDayOfWeek = this.startWeekOnMonday ? (defaultDate.getDay() || 7) - 1 : defaultDate.getDay();
+    if (startDayOfWeek !== 0) {
+      defaultDate.setDate(defaultDate.getDate() - startDayOfWeek);
+    }
+    return defaultDate;
+  }
 
   @property<string>({ type: String, attribute: 'end-date' })
   set endDate(value: string) {
