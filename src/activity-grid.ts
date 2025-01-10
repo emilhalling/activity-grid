@@ -224,16 +224,13 @@ export class ActivityGrid extends HTMLElement {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const visibleMonths: string[] = [];
 
-    // Determine which months are actually visible in our data
-    let currentMonth = -1;
-    const sortedCells = Object.values(this.cells)
-      .sort((a, b) => a.date.getTime() - b.date.getTime());
-    for (const cell of sortedCells) {
-      const month = cell.date.getMonth();
-      if (month !== currentMonth) {
-        currentMonth = month;
-        visibleMonths.push(months[month]);
-      }
+    let currentMonthDate = new Date(this.startDate);
+    currentMonthDate.setDate(1);
+    console.log(currentMonthDate);
+
+    while (currentMonthDate <= this._endDate) {
+      visibleMonths.push(months[currentMonthDate.getMonth()]);
+      currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
     }
 
     return `
