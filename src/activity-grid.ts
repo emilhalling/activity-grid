@@ -1,5 +1,6 @@
 import { customElement, property, state } from './decorators';
-import { ActivityData, DayCell, DayCellMap } from './types';
+import { ActivityData, DayCellMap } from './types';
+import { themes, isValidTheme, ColorTheme } from './themes';
 
 const template = `
   <style>
@@ -80,7 +81,43 @@ export class ActivityGrid extends HTMLElement {
   data: ActivityData[] = [];
 
   @property<string[]>({ type: Array })
-  colors: string[] = ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
+  set colors(value: string[]) {
+    // Only update colors if no theme is set or if colors are explicitly set
+    if (!this._colorTheme) {
+      this._colors = value;
+      if (this.requestUpdate) {
+        this.requestUpdate('colors', this._colors, value);
+      }
+    }
+  }
+  
+  get colors(): string[] {
+    return this._colorTheme ? themes[this._colorTheme] : this._colors;
+  }
+
+  private _colors: string[] = themes.default;
+
+  @property<string>({ type: String, attribute: 'color-theme' })
+  set colorTheme(value: string) {
+    if (!value) {
+      this._colorTheme = null;
+    } else if (isValidTheme(value)) {
+      this._colorTheme = value;
+    } else {
+      console.warn(`Invalid color theme "${value}". Using default theme.`);
+      this._colorTheme = null;
+    }
+    
+    if (this.requestUpdate) {
+      this.requestUpdate('colorTheme', null, value);
+    }
+  }
+
+  get colorTheme(): string {
+    return this._colorTheme || '';
+  }
+
+  private _colorTheme: ColorTheme | null = null;
 
   @property<string>({ type: String })
   emptyColor: string = '#ebedf0';
@@ -204,7 +241,7 @@ export class ActivityGrid extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['start-week-on-monday', 'skip-weekends', 'data', 'colors', 'empty-color', 'max-level', 'end-date', 'start-date'];
+    return ['start-week-on-monday', 'skip-weekends', 'data', 'colors', 'color-theme','empty-color', 'max-level', 'end-date', 'start-date'];
   }
 
   requestUpdate(name: string, oldValue: any, newValue: any) {
@@ -329,14 +366,14 @@ export class ActivityGrid extends HTMLElement {
             gridHTML += `
               <div class="cell" 
                   style="background-color: ${this.colors[cell.level] || this.emptyColor}"
-                  title="${currentDate.toDateString()}: ${cell.count} contributions">
+                  title="${currentDate.toDateString()}: ${cell.count} activities">
               </div>`;
           } else {
             // Create empty cell
             gridHTML += `
               <div class="cell" 
                   style="background-color: ${this.emptyColor}"
-                  title="${currentDate.toDateString()}: 0 contributions">
+                  title="${currentDate.toDateString()}: 0 activities">
               </div>`;
           }
         }
