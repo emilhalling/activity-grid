@@ -1,79 +1,7 @@
 import { customElement, property, state } from './decorators';
 import { ActivityData, DayCellMap } from './types';
 import { themes, isValidTheme, ColorTheme } from './themes';
-
-const template = `
-  <style>
-    :host {
-      display: inline-block;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    }
-
-    .container {
-      display: inline-grid;
-      grid-template-rows: auto 1fr;
-    }
-
-    .months {
-      display: flex;
-      padding-left: 32px;
-      font-size: 12px;
-      color: #767676;
-      height: 20px;
-    }
-
-    .months-spacer {
-      width: 30px;
-    }
-
-    .months-container {
-      display: flex;
-      justify-content: space-between;
-      flex: 1;
-    }
-
-    .months span {
-      padding: 0 4px;
-    }
-
-    .grid-wrapper {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 4px;
-    }
-
-    .weekdays {
-      display: grid;
-      grid-template-rows: repeat(7, 1fr);
-      gap: 2px;
-      text-align: right;
-      padding-left: 6px;
-      padding-right: 2px;
-      font-size: 12px;
-      color: #767676;
-      margin-top: -1px;
-      height: calc(7 * 10px + 6 * 2px);
-    }
-
-    .weekdays div {
-      height: 10px;
-      line-height: 10px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(var(--grid-columns), 1fr);
-      grid-template-rows: repeat(7, 1fr);
-      gap: 2px;
-    }
-
-    .cell {
-      width: 10px;
-      height: 10px;
-      border-radius: 2px;
-    }
-  </style>
-`;
+import { template } from './template';
 
 @customElement('activity-grid')
 export class ActivityGrid extends HTMLElement {
@@ -121,9 +49,6 @@ export class ActivityGrid extends HTMLElement {
 
   @property<string>({ type: String })
   emptyColor: string = '#ebedf0';
-
-  @property<number>({ type: Number })
-  maxLevel: number = 4;
 
   @property<boolean>({ type: Boolean })
   skipWeekends: boolean = false;
@@ -263,7 +188,6 @@ export class ActivityGrid extends HTMLElement {
 
     let currentMonthDate = new Date(this.startDate);
     currentMonthDate.setDate(1);
-    console.log(currentMonthDate);
 
     while (currentMonthDate <= this._endDate) {
       visibleMonths.push(months[currentMonthDate.getMonth()]);
@@ -307,8 +231,9 @@ export class ActivityGrid extends HTMLElement {
 
   private calculateLevel(count: number): number {
     if (count === 0) return 0;
+    const maxLevel = this.colors.length - 1; // -1 because we start from 0
     const max = Math.max(...this.data.map(d => d.count));
-    return Math.ceil((count / max) * this.maxLevel);
+    return Math.ceil((count / max) * maxLevel);
   }
 
   private getWeeksBetweenDates(startDate: Date, endDate: Date): number {
