@@ -134,8 +134,6 @@ export class ActivityGrid extends HTMLElement {
       this._startDate = date;
     }
 
-    this._startDate.setHours(0, 0, 0, 1);
-
     if (this.requestUpdate) {
       this.requestUpdate('startDate', null, value);
     }
@@ -153,8 +151,6 @@ export class ActivityGrid extends HTMLElement {
     if (startDayOfWeek !== 0) {
       defaultDate.setDate(defaultDate.getDate() - startDayOfWeek);
     }
-    // defaultDate.setHours(0, 0, 0, 1);
-    console.log(defaultDate)
     return defaultDate;
   })();
 
@@ -328,6 +324,8 @@ export class ActivityGrid extends HTMLElement {
     const numWeeks = this.getWeeksBetweenDates(endOfDateFull, startDate);
     this.style.setProperty('--grid-columns', numWeeks.toString());
 
+    const startDateNoTime = new Date(this.startDate)
+    startDateNoTime.setHours(0, 0, 0, 0);
     const daysInWeek = this.skipWeekends ? 5 : 7;
     for (let dayOffset = 0; dayOffset < daysInWeek; dayOffset++) {
       // For each week
@@ -340,7 +338,7 @@ export class ActivityGrid extends HTMLElement {
         const dateKey = currentDate.toISOString().split('T')[0];
         const cell = this.cells[dateKey];
 
-        if (currentDate < startDate) {
+        if (currentDate < startDateNoTime) {
           gridHTML += `
               <div class="cell" 
                   style="background-color: transparent">
