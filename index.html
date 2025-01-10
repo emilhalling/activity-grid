@@ -18,10 +18,12 @@
 <body>
 	<h1>Activity Grid Demo</h1>
 
-	<activity-grid start-date="2024-01-12"></activity-grid>
+	<activity-grid></activity-grid>
 	
 	<script type="module">
 		import './src/index.ts';
+
+		const darkModeColor = "#0d1117";
 
 		// Generate some sample data
 		const generateSampleData = () => {
@@ -49,9 +51,11 @@
 			return data;
 		};
 
+		let sampleDate = generateSampleData();
+
 		// Get the component and set data
 		const grid = document.querySelector('activity-grid');
-		grid.data = generateSampleData();
+		grid.data = sampleDate;
 	</script>
 </body>
 

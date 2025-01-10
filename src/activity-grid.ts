@@ -50,7 +50,7 @@ export class ActivityGrid extends HTMLElement {
     // Check if all colors are valid
     const invalidColors = value.filter(color => !CSS.supports('color', color));
     if (invalidColors.length > 0) {
-      console.warn(`Invalid colors found: ${invalidColors.join(', ')}. Using default theme.`);
+      console.warn(`Invalid colors found when trying to set color theme: ${invalidColors.join(', ')}. Using default theme.`);
       this._colors = themes.default;
       if (this.requestUpdate) {
         this.requestUpdate('colors', this._colors, themes.default);
@@ -95,8 +95,51 @@ export class ActivityGrid extends HTMLElement {
 
   private _colorTheme: ColorTheme | null = null;
 
+  @property<boolean>({ type: Boolean, attribute: 'dark-mode' })
+  set darkMode(value: boolean) {
+    const oldValue = this._darkMode;
+    this._darkMode = value;
+    
+    // Update the empty color when dark mode changes
+    this.emptyColor = value ? '#161b22' : '#ebedf0';
+    
+    if (this.requestUpdate) {
+      this.requestUpdate('darkMode', oldValue, value);
+    }
+  }
+
+  get darkMode(): boolean {
+    return this._darkMode;
+  }
+
+  private _darkMode: boolean = false;
+
   @property<string>({ type: String })
-  emptyColor: string = '#ebedf0';
+  set emptyColor(value: string | null) {
+    const oldValue = this._emptyColor;
+    // Color not set => default color
+    if (value === null) {
+      this._emptyColor = this._darkMode ? '#161b22' : '#ebedf0';
+    }
+    // Invalid color set => default color
+    else if (!CSS.supports('color', value)) {
+      console.warn(`Invalid color found when trying to set empty color: ${value}. Using default color.`);
+      this._emptyColor = this._darkMode ? '#161b22' : '#ebedf0';
+    }
+    else {
+      this._emptyColor = value;
+    }
+    
+    if (this.requestUpdate) {
+      this.requestUpdate('emptyColor', oldValue, this._emptyColor);
+    }
+  }
+
+  get emptyColor(): string {
+    return this._emptyColor;
+  }
+
+  private _emptyColor: string = this._darkMode ? '#161b22' : '#ebedf0';
 
   @property<boolean>({ type: Boolean })
   skipWeekends: boolean = false;
@@ -223,7 +266,7 @@ export class ActivityGrid extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['start-week-on-monday', 'skip-weekends', 'data', 'colors', 'color-theme','empty-color', 'max-level', 'end-date', 'start-date'];
+    return ['start-week-on-monday', 'skip-weekends', 'data', 'colors', 'color-theme','empty-color', 'max-level', 'end-date', 'start-date', 'dark-mode'];
   }
 
   requestUpdate(name: string, oldValue: any, newValue: any) {

@@ -5,6 +5,12 @@ export const template = `
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     }
 
+    /* Dark mode styles */
+    :host([dark-mode]) {
+      color: #c9d1d9;
+      background-color: transparent;
+    }
+
     .container {
       display: inline-grid;
       grid-template-rows: auto 1fr;
@@ -16,6 +22,10 @@ export const template = `
       font-size: 12px;
       color: #767676;
       height: 20px;
+    }
+
+    :host([dark-mode]) .months {
+      color: #8b949e;
     }
 
     .months-spacer {
@@ -49,6 +59,10 @@ export const template = `
       color: #767676;
       margin-top: -1px;
       height: calc(7 * 10px + 6 * 2px);
+    }
+
+    :host([dark-mode]) .weekdays {
+      color: #8b949e;
     }
 
     .weekdays div {
