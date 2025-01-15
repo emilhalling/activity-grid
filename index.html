@@ -19,7 +19,7 @@
 	<h1>Activity Grid Demo</h1>
 
 	<activity-grid></activity-grid>
-	
+
 	<script type="module">
 		import './src/index.ts';
 
@@ -56,6 +56,13 @@
 		// Get the component and set data
 		const grid = document.querySelector('activity-grid');
 		grid.data = sampleDate;
+
+		const handleCellClick = (event) => {
+			const { date, count } = event.detail;
+			console.log(`Cell clicked: Date=${date}, Count=${count} activities`);
+		};
+
+		grid.addEventListener('cell-click', handleCellClick);
 	</script>
 </body>
 

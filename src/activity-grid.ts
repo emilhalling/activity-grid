@@ -2,9 +2,14 @@ import { customElement, property, state } from './decorators';
 import { ActivityData, DayCellMap, isValidActivityData } from './types';
 import { themes, isValidTheme, ColorTheme } from './themes';
 import { template } from './template';
+import { GridRenderer } from './grid-renderer';
+import { createCellClickEvent } from './events';
+import { DEFAULT_EMPTY_COLOR, DATE_FORMAT_REGEX } from './constants';
 
 @customElement('activity-grid')
 export class ActivityGrid extends HTMLElement {
+  private readonly gridRenderer: GridRenderer = new GridRenderer();
+
   @property<ActivityData[]>({ type: Array })
   set data(value: ActivityData[]) {
     if (!value || !Array.isArray(value)) {
@@ -12,21 +17,22 @@ export class ActivityGrid extends HTMLElement {
       this._data = [];
       return;
     }
-  
+
     const invalidItems = value.filter(item => !isValidActivityData(item));
-  
+
     if (invalidItems.length > 0) {
       console.warn(
-        'Invalid items found in activity data. They will be filtered out:', 
+        'Invalid items found in activity data. They will be filtered out:',
         invalidItems
       );
     }
-  
+
     this._data = value.filter(item => !invalidItems.includes(item));
-  
-    if (this.requestUpdate) {
-      this.requestUpdate('data', this._data, value);
-    }
+
+    // if (this.requestUpdate) {
+    //   this.requestUpdate('data', this._data, value);
+    // }
+    this.updateGrid();
   }
 
   get data(): ActivityData[] {
@@ -41,9 +47,10 @@ export class ActivityGrid extends HTMLElement {
     if (!value || !Array.isArray(value) || value.length === 0) {
       console.warn('Invalid or empty colors array provided. Using default theme.');
       this._colors = themes.default;
-      if (this.requestUpdate) {
-        this.requestUpdate('colors', this._colors, themes.default);
-      }
+      // if (this.requestUpdate) {
+      //   this.requestUpdate('colors', this._colors, themes.default);
+      // }
+      this.updateGrid();
       return;
     }
 
@@ -61,12 +68,14 @@ export class ActivityGrid extends HTMLElement {
     // Only update colors if no theme is set or if colors are explicitly set
     if (!this._colorTheme) {
       this._colors = value;
-      if (this.requestUpdate) {
-        this.requestUpdate('colors', this._colors, value);
-      }
+      // if (this.requestUpdate) {
+      //   this.requestUpdate('colors', this._colors, value);
+      // }
+      this.updateGrid();
+
     }
   }
-  
+
   get colors(): string[] {
     return this._colorTheme ? themes[this._colorTheme] : this._colors;
   }
@@ -83,10 +92,11 @@ export class ActivityGrid extends HTMLElement {
       console.warn(`Invalid color theme "${value}". Using default theme.`);
       this._colorTheme = null;
     }
-    
-    if (this.requestUpdate) {
-      this.requestUpdate('colorTheme', null, value);
-    }
+
+    // if (this.requestUpdate) {
+    //   this.requestUpdate('colorTheme', null, value);
+    // }
+    this.updateGrid();
   }
 
   get colorTheme(): string {
@@ -99,13 +109,14 @@ export class ActivityGrid extends HTMLElement {
   set darkMode(value: boolean) {
     const oldValue = this._darkMode;
     this._darkMode = value;
-    
+
     // Update the empty color when dark mode changes
     this.emptyColor = value ? '#161b22' : '#ebedf0';
-    
-    if (this.requestUpdate) {
-      this.requestUpdate('darkMode', oldValue, value);
-    }
+
+    // if (this.requestUpdate) {
+    //   this.requestUpdate('darkMode', oldValue, value);
+    // }
+    this.updateGrid();
   }
 
   get darkMode(): boolean {
@@ -129,10 +140,11 @@ export class ActivityGrid extends HTMLElement {
     else {
       this._emptyColor = value;
     }
-    
-    if (this.requestUpdate) {
-      this.requestUpdate('emptyColor', oldValue, this._emptyColor);
-    }
+
+    // if (this.requestUpdate) {
+    //   this.requestUpdate('emptyColor', oldValue, this._emptyColor);
+    // }
+    this.updateGrid();
   }
 
   get emptyColor(): string {
@@ -149,9 +161,11 @@ export class ActivityGrid extends HTMLElement {
     const oldValue = this._startWeekOnMonday;
     // If weekends are excluded, force startWeekOnMonday to true
     this._startWeekOnMonday = this.skipWeekends ? true : value;
-    if (this.requestUpdate) {
-      this.requestUpdate('startWeekOnMonday', oldValue, this._startWeekOnMonday);
-    }
+    // if (this.requestUpdate) {
+    //   this.requestUpdate('startWeekOnMonday', oldValue, this._startWeekOnMonday);
+    // }
+    this.updateGrid();
+
   }
 
   get startWeekOnMonday(): boolean {
@@ -167,7 +181,7 @@ export class ActivityGrid extends HTMLElement {
       console.warn('Invalid start-date provided. Using one year before end date instead.');
       const defaultDate = this.createDefaultStartDate();
       this._startDate = defaultDate;
-    } 
+    }
     else if (date > this._endDate) {
       console.warn('Start date cannot be after end date. Using one year before end date instead.');
       const defaultDate = this.createDefaultStartDate();
@@ -177,13 +191,15 @@ export class ActivityGrid extends HTMLElement {
       this._startDate = date;
     }
 
-    if (this.requestUpdate) {
-      this.requestUpdate('startDate', null, value);
-    }
+    // if (this.requestUpdate) {
+    //   this.requestUpdate('startDate', null, value);
+    // }
+    this.updateGrid();
+
   }
 
   get startDate(): string {
-    return this._startDate.toISOString().split('T')[0];
+    return this.getDateKey(this._startDate);
   }
 
   private _startDate: Date = (() => {
@@ -219,16 +235,26 @@ export class ActivityGrid extends HTMLElement {
       this._endDate = date;
     }
 
-    if (this.requestUpdate) {
-      this.requestUpdate('endDate', null, value);
-    }
+    // if (this.requestUpdate) {
+    //   this.requestUpdate('endDate', null, value);
+    // }
+    this.updateGrid();
   }
 
   get endDate(): string {
-    return this._endDate.toISOString().split('T')[0];
+    return this.getDateKey(this._endDate);
   }
 
   private _endDate: Date = new Date();
+
+  private handleCellClick(event: MouseEvent, cellData: { date: string, count: number }) {
+    const customEvent = new CustomEvent('cell-click', {
+      detail: cellData,
+      bubbles: true,
+      composed: true
+    });
+    this.dispatchEvent(customEvent);
+  }
 
   @state()
   private cells: DayCellMap = {};
@@ -266,21 +292,21 @@ export class ActivityGrid extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['start-week-on-monday', 'skip-weekends', 'data', 'colors', 'color-theme','empty-color', 'max-level', 'end-date', 'start-date', 'dark-mode'];
+    return ['start-week-on-monday', 'skip-weekends', 'data', 'colors', 'color-theme', 'empty-color', 'max-level', 'end-date', 'start-date', 'dark-mode'];
   }
 
-  requestUpdate(name: string, oldValue: any, newValue: any) {
-    if (oldValue !== newValue) {
-      if (name === 'data') {
-        this.cells = this.generateGridCells();
-      }
-      if (name === 'skipWeekends' && newValue) {
-        // If weekends are being excluded, force startWeekOnMonday to true
-        this.startWeekOnMonday = true;
-      }
-      this.render();
-    }
-  }
+  // requestUpdate(name: string, oldValue: any, newValue: any) {
+  //   if (oldValue !== newValue) {
+  //     if (name === 'data') {
+  //       this.cells = this.generateGridCells();
+  //     }
+  //     if (name === 'skipWeekends' && newValue) {
+  //       // If weekends are being excluded, force startWeekOnMonday to true
+  //       this.startWeekOnMonday = true;
+  //     }
+  //     this.render();
+  //   }
+  // }
 
   private createMonthLabels() {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -336,10 +362,50 @@ export class ActivityGrid extends HTMLElement {
     return Math.ceil((count / max) * maxLevel);
   }
 
+  private updateGrid(): void {
+    if (!this.shadowRoot) return;
+
+    this.cells = this.generateGridCells();
+
+    const rendered = this.gridRenderer.render(
+      this.cells,
+      this._startDate,
+      this._endDate,
+      {
+        colors: this.colors,
+        emptyColor: this.emptyColor,
+        skipWeekends: this.skipWeekends,
+        startWeekOnMonday: this.startWeekOnMonday
+      }
+    );
+
+    this.shadowRoot.innerHTML = `${template}${rendered}`;
+    this.attachEventListeners();
+  }
+
+  private attachEventListeners(): void {
+    if (!this.shadowRoot) return;
+
+    const cells = this.shadowRoot.querySelectorAll('.cell[data-date]');
+    cells.forEach(cell => {
+      cell.addEventListener('click', (event) => {
+        const date = cell.getAttribute('data-date');
+        const count = parseInt(cell.getAttribute('data-count') || '0', 10);
+        if (date) {
+          this.dispatchEvent(createCellClickEvent({ date, count }));
+        }
+      });
+    });
+  }
+
   private getWeeksBetweenDates(startDate: Date, endDate: Date): number {
     const msPerWeek = 7 * 24 * 60 * 60 * 1000;
     const diffInMs = Math.abs(endDate.getTime() - startDate.getTime());
     return Math.ceil(diffInMs / msPerWeek);
+  }
+
+  private getDateKey(date: Date): string {
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
   }
 
   private render() {
@@ -375,10 +441,10 @@ export class ActivityGrid extends HTMLElement {
       for (let week = 0; week < numWeeks; week++) {
         const currentDate = new Date(startDayWeekAligned);
         currentDate.setDate(currentDate.getDate() + dayOffset + (week * 7));
-        currentDate.setHours(0, 0, 0, 1);
+        currentDate.setHours(0, 0, 0, 0);
 
         // Format date as YYYY-MM-DD
-        const dateKey = currentDate.toISOString().split('T')[0];
+        const dateKey = this.getDateKey(currentDate);
         const cell = this.cells[dateKey];
 
         if (currentDate < startDateNoTime) {
@@ -393,14 +459,18 @@ export class ActivityGrid extends HTMLElement {
             gridHTML += `
               <div class="cell" 
                   style="background-color: ${this.colors[cell.level] || this.emptyColor}"
-                  title="${currentDate.toDateString()}: ${cell.count} activities">
+                  title="${currentDate.toDateString()}: ${cell.count} activities"
+                  data-date="${dateKey}"
+                  data-count="${cell.count}">
               </div>`;
           } else {
             // Create empty cell
             gridHTML += `
               <div class="cell" 
                   style="background-color: ${this.emptyColor}"
-                  title="${currentDate.toDateString()}: 0 activities">
+                  title="${currentDate.toDateString()}: 0 activities"
+                  data-date="${dateKey}"
+                  data-count="0">
               </div>`;
           }
         }
@@ -427,6 +497,17 @@ export class ActivityGrid extends HTMLElement {
                 </div>
             </div>
         `;
+
+    const cells = this.shadowRoot.querySelectorAll('.cell');
+    cells.forEach(cell => {
+      cell.addEventListener('click', (event) => {
+        const date = cell.getAttribute('data-date');
+        const count = parseInt(cell.getAttribute('data-count') || '0', 10);
+        if (date) {
+          this.handleCellClick(event as MouseEvent, { date, count });
+        }
+      });
+    });
   }
 
 }
