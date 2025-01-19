@@ -100,7 +100,8 @@ export class GridRenderer {
                                 style="background-color: ${colors[cell.level] || emptyColor}"
                                 title="${currentDate.toDateString()}: ${cell.count} activities"
                                 data-date="${dateKey}"
-                                data-count="${cell.count}">
+                                data-count="${cell.count}"
+            					${cell.id ? `cell-id="${cell.id}"` : ''}>
                             </div>`;
 					} else {
 						gridHTML += `

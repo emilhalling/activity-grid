@@ -1,7 +1,11 @@
 
 export interface ActivityData {
+	/** Date in YYYY-MM-DD format */
 	date: string;
+	/** Number of activities for this date (must be non-negative) */
 	count: number;
+	/** Optional identifier for the cell */
+	id?: string;
 }
 
 export function isValidActivityData(item: unknown): boolean {
@@ -63,6 +67,8 @@ export interface DayCell {
 	level: number;
 	/** Whether this cell should be ignored in the grid */
 	ignore: boolean;
+	/** Optional identifier for the cell */
+	id?: string;
 }
 
 /**

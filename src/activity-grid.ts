@@ -160,29 +160,29 @@ export class ActivityGrid extends HTMLElement {
 
   @property<string>({ type: String, attribute: 'start-date' })
   set startDate(value: string) {
-    const date = value ? new Date(value) : new Date();
-    if (isNaN(date.getTime())) {
+    const date = value ? new Date(value) : null;
+    if (date && !isNaN(date.getTime())) {
+      if (date > this._endDate) {
+        console.warn('Start date cannot be after end date. Using one year before end date instead.');
+        this._startDate = this.createDefaultStartDate();
+      } else {
+        this._startDate = date;
+      }
+    } else if (!this._startDate) {  // Only create default if not already set
       console.warn('Invalid start-date provided. Using one year before end date instead.');
-      const defaultDate = this.createDefaultStartDate();
-      this._startDate = defaultDate;
-      return;
-    }
-    else if (date > this._endDate) {
-      console.warn('Start date cannot be after end date. Using one year before end date instead.');
-      const defaultDate = this.createDefaultStartDate();
-      this._startDate = defaultDate;
-      return;
+      this._startDate = this.createDefaultStartDate();
     }
 
-    this._startDate = date;
-    this.updateGrid();
+    if (this.isConnected) {
+      this.updateGrid();
+    }
   }
 
   get startDate(): string {
-    return getDateKey(this._startDate);
+    return this._startDate ? getDateKey(this._startDate) : getDateKey(this.createDefaultStartDate());
   }
 
-  private _startDate: Date = this.createDefaultStartDate();
+  private _startDate: Date | null;// = this.createDefaultStartDate();
   //#endregion
 
   // #region lifecycle Methods
@@ -192,9 +192,15 @@ export class ActivityGrid extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+
+    this._startDate = null;
   }
 
   connectedCallback() {
+    if (!this._startDate) {
+      this._startDate = this.createDefaultStartDate();
+    }
+
     this.updateGrid();
   }
 
@@ -247,6 +253,7 @@ export class ActivityGrid extends HTMLElement {
     if (startDayOfWeek !== 0) {
       defaultDate.setDate(defaultDate.getDate() - startDayOfWeek);
     }
+
     return defaultDate;
   }
 
@@ -259,7 +266,8 @@ export class ActivityGrid extends HTMLElement {
         date: new Date(activity.date),
         count: activity.count,
         level: this.calculateLevel(activity.count),
-        ignore: false
+        ignore: false,
+        id: activity.id
       };
     });
 
@@ -300,6 +308,11 @@ export class ActivityGrid extends HTMLElement {
 
     this.cells = this.generateGridCells();
 
+    // Ensure we have a valid start date
+    if (!this._startDate) {
+      this._startDate = this.createDefaultStartDate();
+    }
+
     const { html, numOfWeeks } = this.gridRenderer.render(
       this.cells,
       this._startDate,
@@ -325,8 +338,9 @@ export class ActivityGrid extends HTMLElement {
       cell.addEventListener('click', (event) => {
         const date = cell.getAttribute('data-date');
         const count = parseInt(cell.getAttribute('data-count') || '0', 10);
+        const id = cell.getAttribute('cell-id') || undefined;
         if (date) {
-          this.dispatchEvent(createCellClickEvent({ date, count }));
+          this.dispatchEvent(createCellClickEvent({ date, count, id }));
         }
       });
     });
