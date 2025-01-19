@@ -1,5 +1,5 @@
 import { DayCellMap } from './types';
-import { MONTH_LABELS, WEEKDAY_LABELS } from './constants';
+import { MONTH_LABELS, WEEKDAY_LABELS, getDateKey } from './constants';
 
 export class GridRenderer {
 	private createMonthLabels(startDate: Date, endDate: Date): string {
@@ -29,6 +29,12 @@ export class GridRenderer {
 				.join('\n')}
             </div>
         `;
+	}
+
+	private getWeeksBetweenDates(startDate: Date, endDate: Date): number {
+		const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+		const diffInMs = Math.abs(endDate.getTime() - startDate.getTime());
+		return Math.ceil(diffInMs / msPerWeek);
 	}
 
 	private createGridCells(
@@ -64,22 +70,19 @@ export class GridRenderer {
 		}
 
 		// Calculate number of weeks
-		const weekDiff = Math.ceil(
-			(endDateFull.getTime() - startDayWeekAligned.getTime()) /
-			(7 * 24 * 60 * 60 * 1000)
-		);
+		const numWeeks = this.getWeeksBetweenDates(endDateFull, startDate);
 
 		// Generate grid HTML
 		for (let dayOffset = 0; dayOffset < daysInWeek; dayOffset++) {
 			const isWeekend = dayOffset > 4;
 			if (skipWeekends && isWeekend) continue;
 
-			for (let week = 0; week < weekDiff; week++) {
+			for (let week = 0; week < numWeeks; week++) {
 				const currentDate = new Date(startDayWeekAligned);
 				currentDate.setDate(currentDate.getDate() + dayOffset + (week * 7));
 				currentDate.setHours(0, 0, 0, 0);
 
-				const dateKey = this.getDateKey(currentDate);
+				const dateKey = getDateKey(currentDate);
 				const cell = cells[dateKey];
 
 				if (currentDate < startDateNoTime) {
@@ -122,10 +125,6 @@ export class GridRenderer {
 		return gridHTML;
 	}
 
-	private getDateKey(date: Date): string {
-		return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-	}
-
 	public render(
 		cells: DayCellMap,
 		startDate: Date,
@@ -136,7 +135,16 @@ export class GridRenderer {
 			skipWeekends: boolean;
 			startWeekOnMonday: boolean;
 		}
-	): string {
+	): { html: string; numOfWeeks: number } {
+		// Calculate number of weeks
+		const endDateFull = new Date(endDate);
+		let endDayOffset = options.skipWeekends ? 5 - endDate.getDay() : 7 - endDate.getDay();
+		if (options.startWeekOnMonday) {
+			endDayOffset += 1;
+		}
+		endDateFull.setDate(endDateFull.getDate() + endDayOffset);
+		const numOfWeeks = this.getWeeksBetweenDates(endDateFull, startDate);
+
 		const monthLabels = this.createMonthLabels(startDate, endDate);
 		const weekLabels = this.createWeekLabels(
 			options.startWeekOnMonday,
@@ -152,11 +160,10 @@ export class GridRenderer {
 			options.startWeekOnMonday
 		);
 
-		return `
+		return {
+			html: `
             <div class="container">
-                <div class="months">
-                    ${monthLabels}
-                </div>
+                <div class="months">${monthLabels}</div>
                 <div class="grid-wrapper">
                     ${weekLabels}
                     <div class="grid">
@@ -164,6 +171,8 @@ export class GridRenderer {
                     </div>
                 </div>
             </div>
-        `;
+        `,
+			numOfWeeks
+		};
 	}
 }

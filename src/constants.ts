@@ -9,9 +9,11 @@ export const DEFAULT_EMPTY_COLOR = {
 	dark: '#161b22'
 };
 
-export const DATE_FORMAT_REGEX = /^\d{4}-\d{2}-\d{2}$/;
-
 export const CELL_SIZE = {
 	width: 10,
 	height: 10
 };
+
+export const getDateKey = (date: Date) => {
+	return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+}
