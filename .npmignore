@@ -8,4 +8,4 @@ tests/
 tsconfig.json
 vite.config.js
 index.html
-dosc/
+docs/
