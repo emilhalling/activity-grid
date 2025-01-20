@@ -1,0 +1,10 @@
+src/
+.github/
+.vscode/
+examples/
+tests/
+*.test.*
+.gitignore
+tsconfig.json
+vite.config.js
+index.html

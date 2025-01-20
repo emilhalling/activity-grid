@@ -1,31 +1,55 @@
 {
   "name": "activity-grid",
+  "type": "module",
   "version": "0.1.0",
   "description": "A customizable activity grid component similar to GitHub's contribution graph",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/activity-grid.umd.js",
+  "module": "dist/activity-grid.es.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/**/__tests__/**"
   ],
+  "sideEffects": false,
   "scripts": {
-    "build": "vite build",
-    "watch": "tsc -w",
+    "dev": "vite",
+    "build": "vite build && tsc --emitDeclarationOnly",
+    "preview": "vite preview",
+    "prebuild": "rimraf dist",
     "prepare": "npm run build",
-    "dev": "vite"
+    "prepublishOnly": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "keywords": [
     "activity",
+    "github-style",
+    "calendar-heatmap",
+    "custom-element",
     "grid",
     "heatmap",
     "contribution-graph",
     "web-components",
     "typescript"
   ],
-  "author": "",
+  "author": "emilhalling",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/activity-grid"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/activity-grid/issues"
+  },
+  "homepage": "https://github.com/yourusername/activity-grid#readme",
   "devDependencies": {
+    "rimraf": "^5.0.10",
     "typescript": "^5.0.0",
     "vite": "^6.0.7"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
