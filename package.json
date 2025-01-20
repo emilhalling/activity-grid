@@ -38,12 +38,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/activity-grid"
+    "url": "https://github.com/emilhalling/activity-grid"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/activity-grid/issues"
+    "url": "https://github.com/emilhalling/activity-grid/issues"
   },
-  "homepage": "https://github.com/yourusername/activity-grid#readme",
+  "homepage": "https://github.com/emilhalling/activity-grid#readme",
   "devDependencies": {
     "rimraf": "^5.0.10",
     "typescript": "^5.0.0",
