@@ -5,6 +5,8 @@ A customizable activity grid component that creates GitHub-style contribution gr
 [![npm version](https://badge.fury.io/js/activity-grid.svg)](https://badge.fury.io/js/activity-grid)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+![Default View](docs/images/default.png)
+
 ## Features
 
 - 📊 GitHub-style activity visualization
@@ -93,16 +95,43 @@ interface ActivityData {
 
 ### Color Themes
 
+The activity grid comes with several built-in themes:
+
+#### Default (Green)
 ```html
-<!-- Default green theme -->
 <activity-grid></activity-grid>
+```
+![Default Theme](docs/images/default.png)
 
-<!-- Blue theme -->
+#### Blue Theme
+```html
 <activity-grid color-theme="blue"></activity-grid>
+```
+![Blue Theme](docs/images/blue.png)
 
-<!-- Custom colors -->
+#### Red Theme
+```html
+<activity-grid color-theme="red"></activity-grid>
+```
+![Red Theme](docs/images/red.png)
+
+#### Yellow Theme
+```html
+<activity-grid color-theme="yellow"></activity-grid>
+```
+![Yellow Theme](docs/images/yellow.png)
+
+#### Purple Theme
+```html
+<activity-grid color-theme="purple"></activity-grid>
+```
+![Purple Theme](docs/images/purple.png)
+
+#### Custom Colors
+```html
 <activity-grid colors='["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"]'></activity-grid>
 ```
+![Custom Colors](docs/images/custom_colors.png)
 
 ### Week Configuration
 
@@ -119,6 +148,7 @@ interface ActivityData {
 ```html
 <activity-grid dark-mode></activity-grid>
 ```
+![Dark Mode](docs/images/dark_mode.png)
 
 ### Custom Date Range
 
@@ -128,6 +158,7 @@ interface ActivityData {
   end-date="2024-12-31">
 </activity-grid>
 ```
+![Custom Date Range](docs/images/custom_dates.png)
 
 ### Handling Click Events
 
@@ -220,6 +251,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [ ] Add more framework examples (Angular, Svelte)
 - [ ] Create interactive demo site
-- [ ] Add animation options
-- [ ] Add tooltip customization
-- [ ] Add more color themes
