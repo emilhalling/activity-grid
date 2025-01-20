@@ -8,6 +8,7 @@ export interface ActivityData {
 	id?: string;
 }
 
+/** @internal */
 export function isValidActivityData(item: unknown): boolean {
 	// Check if item has required properties
 	if (!item || typeof item !== 'object' || !('date' in item) || !('count' in item)) {
@@ -56,8 +57,9 @@ export interface ActivityGridOptions {
 }
 
 /**
- * Internal representation of a day cell in the grid
+ * Representation of a day cell in the grid
  */
+/** @internal */
 export interface DayCell {
 	/** Date object for this cell */
 	date: Date;
@@ -74,6 +76,7 @@ export interface DayCell {
 /**
  * Map of date strings to day cells
  */
+/** @internal */
 export interface DayCellMap {
 	[date: string]: DayCell;
 }

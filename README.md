@@ -64,26 +64,28 @@ interface ActivityData {
 
 The component can be configured with the following attributes/properties:
 
+| Property | Type | Default | Options | Description |
+|----------|------|---------|----------|-------------|
+| `data` | `ActivityData[]` | `[]` | - | Array of activity data points |
+| `colorTheme` | `string` | `'green'` | `'green'`, `'red'`, `'blue'`, `'yellow'`, `'purple'` | Predefined color theme for the grid |
+| `colors` | `string[]` | `['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39']` | Any array of 5 valid CSS colors | Custom color array for activity levels |
+| `emptyColor` | `string` | Light mode: `'#ebedf0'`<br>Dark mode: `'#161b22'` | Any valid CSS color | Color for days with no activity |
+| `darkMode` | `boolean` | `false` | `true`, `false` | Whether to use dark mode colors |
+| `skipWeekends` | `boolean` | `false` | `true`, `false` | Whether to exclude weekends from the grid |
+| `startWeekOnMonday` | `boolean` | `false` | `true`, `false` | Whether to start weeks on Monday instead of Sunday |
+| `startDate` | `string` | One year before end date | Any valid date in `YYYY-MM-DD` format | Start date for the activity grid |
+| `endDate` | `string` | Current date | Any valid date in `YYYY-MM-DD` format | End date for the activity grid |
+
+### ActivityData Interface
+
 ```typescript
-interface ActivityGridOptions {
-  /** Array of activity data points */
-  data: ActivityData[];
-  /** Custom color array for the activity levels (should be 5 colors) */
-  colors?: string[];
-  /** Color theme name ('red' | 'green' | 'blue' | 'yellow' | 'purple') */
-  colorTheme?: string;
-  /** Color for days with no activity */
-  emptyColor?: string;
-  /** Whether to use dark mode colors */
-  darkMode?: boolean;
-  /** Whether to skip weekends in the grid */
-  skipWeekends?: boolean;
-  /** Whether to start weeks on Monday instead of Sunday */
-  startWeekOnMonday?: boolean;
-  /** Start date for the activity grid */
-  startDate?: string; // YYYY-MM-DD format
-  /** End date for the activity grid */
-  endDate?: string; // YYYY-MM-DD format
+interface ActivityData {
+  /** Date in YYYY-MM-DD format */
+  date: string;
+  /** Number of activities for this date (must be non-negative) */
+  count: number;
+  /** Optional identifier for the cell */
+  id?: string;
 }
 ```
 

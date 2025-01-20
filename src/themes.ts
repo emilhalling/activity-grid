@@ -9,6 +9,7 @@ export const themes: Record<ColorTheme | 'default', string[]> = {
   purple: ['#ebedf0', '#e1bee7', '#ab47bc', '#8e24aa', '#4a148c']
 };
 
+/** @internal */
 export const isValidTheme = (theme: string): theme is ColorTheme => {
   return theme in themes && theme !== 'default';
 };
