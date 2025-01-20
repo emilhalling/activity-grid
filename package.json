@@ -1,7 +1,7 @@
 {
   "name": "activity-grid",
   "type": "module",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A customizable activity grid component similar to GitHub's contribution graph",
   "main": "dist/activity-grid.umd.js",
   "module": "dist/activity-grid.es.js",
