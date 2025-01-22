@@ -7,6 +7,15 @@ A customizable activity grid component that creates GitHub-style contribution gr
 
 ![Default View](docs/images/default.png)
 
+## Live Examples
+
+Interactive examples are available on StackBlitz:
+
+[![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://stackblitz.com/edit/vitejs-vite-tgbgx7fx?file=README.md)
+[![Vue.js](https://img.shields.io/badge/vuejs-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D)](https://stackblitz.com/edit/vitejs-vite-cbqzbems?file=README.md)
+[![Angular](https://img.shields.io/badge/angular-%23DD0031.svg?style=for-the-badge&logo=angular&logoColor=white)](https://stackblitz.com/edit/stackblitz-starters-bbdylzzz?file=package.json)
+[![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://stackblitz.com/edit/vitejs-vite-ow4jjek6?file=package.json)
+
 ## Features
 
 - 📊 GitHub-style activity visualization
@@ -15,7 +24,6 @@ A customizable activity grid component that creates GitHub-style contribution gr
 - 📅 Flexible date range configuration
 - 🗓️ Customizable week display (start on Monday, skip weekends)
 - 🎯 Interactive cells with click events
-- �periodstyle Custom color schemes
 - 💪 TypeScript support
 - 🔌 Framework agnostic - works with any frontend framework
 
@@ -226,12 +234,6 @@ onMounted(() => {
 
 More framework examples coming soon!
 
-## Live Examples
-
-Interactive examples are available on:
-- [StackBlitz](coming-soon)
-- [CodeSandbox](coming-soon)
-
 ## Browser Support
 
 The component works in all modern browsers that support Web Components:
@@ -246,8 +248,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Todo
-
-- [ ] Add more framework examples (Angular, Svelte)
-- [ ] Create interactive demo site

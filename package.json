@@ -11,7 +11,7 @@
     "!dist/**/*.test.*",
     "!dist/**/__tests__/**"
   ],
-  "sideEffects": false,
+  "sideEffects": true,
   "scripts": {
     "dev": "vite",
     "build": "vite build && tsc --emitDeclarationOnly",
