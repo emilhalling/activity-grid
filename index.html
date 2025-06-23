@@ -106,6 +106,14 @@
 		</div>
 	</div>
 
+	<div class="demo-section">
+		<h2>Custom Activity Names</h2>
+		<p>Example with custom activity names like "workouts" or "study sessions".</p>
+		<div class="grid-container">
+			<activity-grid id="workout-grid"></activity-grid>
+		</div>
+	</div>
+
 	<script type="module">
 		import './src/index.ts';
 
@@ -171,6 +179,21 @@
 		initGrid('custom-colors-grid', {
 			colors: ['#ebedf0', '#00E5FF', '#00B4D8', '#FF008E', '#D100D1']
 		});
+
+		// Custom title formatter for workouts`
+		const workoutGrid = document.getElementById('workout-grid');
+        if (workoutGrid) {
+            workoutGrid.data = sampleData;
+            workoutGrid.titleFormatter = (date, count) => {
+                if (count === 0) {
+                    return `${date.toDateString()}: Rest day 😴`;
+                }
+                
+                const workouts = count === 1 ? 'workout' : 'workouts';
+                const emoji = count >= 5 ? ' 🔥' : count >= 3 ? ' 💪' : ' 👍';
+                return `${date.toDateString()}: ${count} ${workouts}${emoji}`;
+            };
+        }
 
 		// Custom date ranges
 		const sixMonthsAgo = new Date();

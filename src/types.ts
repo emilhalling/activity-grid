@@ -8,6 +8,13 @@ export interface ActivityData {
 	id?: string;
 }
 
+export type TitleFormatter = {
+	(): string;
+	(date: Date): string;
+	(date: Date, count: number): string;
+	(date: Date, count: number, ...args: any[]): string;
+};
+
 /** @internal */
 export function isValidActivityData(item: unknown): boolean {
 	// Check if item has required properties
@@ -54,6 +61,8 @@ export interface ActivityGridOptions {
 	startDate?: Date;
 	/** End date for the activity grid */
 	endDate?: Date;
+	/** Custom function to format cell titles/tooltips */
+    titleFormatter?: TitleFormatter;
 }
 
 /**

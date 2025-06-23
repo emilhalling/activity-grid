@@ -1,5 +1,5 @@
 import { customElement, property, state } from './decorators';
-import { ActivityData, DayCellMap, isValidActivityData } from './types';
+import { ActivityData, DayCellMap, isValidActivityData, TitleFormatter } from './types';
 import { themes, isValidTheme, ColorTheme } from './themes';
 import { template } from './template';
 import { GridRenderer } from './grid-renderer';
@@ -182,7 +182,19 @@ export class ActivityGrid extends HTMLElement {
     return this._startDate ? getDateKey(this._startDate) : getDateKey(this.createDefaultStartDate());
   }
 
-  private _startDate: Date | null;// = this.createDefaultStartDate();
+  private _startDate: Date | null;
+    
+  // Title formatter property (not an HTML attribute, only accessible via JavaScript)
+  set titleFormatter(value: TitleFormatter | null) {
+    this._titleFormatter = value;
+    this.updateGrid();
+  }
+
+  get titleFormatter(): TitleFormatter | null {
+    return this._titleFormatter;
+  }
+
+  private _titleFormatter: TitleFormatter | null = null;
   //#endregion
 
   // #region lifecycle Methods
@@ -321,7 +333,8 @@ export class ActivityGrid extends HTMLElement {
         colors: this.colors,
         emptyColor: this.emptyColor,
         skipWeekends: this.skipWeekends,
-        startWeekOnMonday: this.startWeekOnMonday
+        startWeekOnMonday: this.startWeekOnMonday,
+        titleFormatter: this.titleFormatter
       }
     );
 

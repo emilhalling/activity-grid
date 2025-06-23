@@ -1,4 +1,4 @@
-import { DayCellMap } from './types';
+import { DayCellMap, TitleFormatter } from './types';
 import { MONTH_LABELS, WEEKDAY_LABELS, getDateKey } from './constants';
 
 export class GridRenderer {
@@ -37,6 +37,11 @@ export class GridRenderer {
 		return Math.ceil(diffInMs / msPerWeek);
 	}
 
+	private defaultTitleFormatter(date: Date, count: number, id?: string): string {
+        const activity = count === 1 ? 'activity' : 'activities';
+        return `${date.toDateString()}: ${count} ${activity}`;
+    }
+
 	private createGridCells(
 		cells: DayCellMap,
 		startDate: Date,
@@ -44,7 +49,8 @@ export class GridRenderer {
 		colors: string[],
 		emptyColor: string,
 		skipWeekends: boolean,
-		startWeekOnMonday: boolean
+		startWeekOnMonday: boolean,
+		titleFormatter?: TitleFormatter | null
 	): string {
 		let gridHTML = '';
 		const daysInWeek = skipWeekends ? 5 : 7;
@@ -95,19 +101,26 @@ export class GridRenderer {
 				else if (currentDate <= endDate) {
 					// Within date range - render activity cell
 					if (cell) {
+						const title = titleFormatter ? 
+                            titleFormatter(currentDate, cell.count, cell.id) : 
+                            this.defaultTitleFormatter(currentDate, cell.count, cell.id);
+                        
 						gridHTML += `
                             <div class="cell" 
                                 style="background-color: ${colors[cell.level] || emptyColor}"
-                                title="${currentDate.toDateString()}: ${cell.count} activities"
+                                title="${title}"
                                 data-date="${dateKey}"
                                 data-count="${cell.count}"
             					${cell.id ? `cell-id="${cell.id}"` : ''}>
                             </div>`;
 					} else {
+                        const title = titleFormatter ? 
+                            titleFormatter(currentDate, 0) : 
+                            this.defaultTitleFormatter(currentDate, 0);
 						gridHTML += `
                             <div class="cell" 
                                 style="background-color: ${emptyColor}"
-                                title="${currentDate.toDateString()}: 0 activities"
+                                title="${title}"
                                 data-date="${dateKey}"
                                 data-count="0">
                             </div>`;
@@ -135,6 +148,7 @@ export class GridRenderer {
 			emptyColor: string;
 			skipWeekends: boolean;
 			startWeekOnMonday: boolean;
+			titleFormatter?: TitleFormatter | null;
 		}
 	): { html: string; numOfWeeks: number } {
 		// Calculate number of weeks
@@ -158,7 +172,8 @@ export class GridRenderer {
 			options.colors,
 			options.emptyColor,
 			options.skipWeekends,
-			options.startWeekOnMonday
+			options.startWeekOnMonday,
+			options.titleFormatter
 		);
 
 		return {
