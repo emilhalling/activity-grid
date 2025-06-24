@@ -178,6 +178,22 @@ grid.addEventListener('cell-click', (event) => {
 });
 ```
 
+### Custom titles/tool-tips
+
+```javascript
+const grid = document.querySelector('activity-grid');
+grid.titleFormatter = (date, count) => {
+    if (count === 0) {
+        return `${date.toDateString()}: Rest day 😴`;
+    }
+    
+    const workouts = count === 1 ? 'workout' : 'workouts';
+    const emoji = count >= 5 ? ' 🔥' : count >= 3 ? ' 💪' : ' 👍';
+    return `${date.toDateString()}: ${count} ${workouts}${emoji}`;
+};
+```
+![Custom titles/tooltips](docs/images/custom_title.png)
+
 ## Framework Integration
 
 ### React

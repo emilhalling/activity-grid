@@ -9,10 +9,8 @@ export interface ActivityData {
 }
 
 export type TitleFormatter = {
-	(): string;
-	(date: Date): string;
-	(date: Date, count: number): string;
-	(date: Date, count: number, ...args: any[]): string;
+  (date: Date, count: number): string;
+  (date: Date, count: number, id?: string): string;
 };
 
 /** @internal */
